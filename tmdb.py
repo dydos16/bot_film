@@ -12,6 +12,7 @@ TIMEOUT = aiohttp.ClientTimeout(total=10)
 MAX_PAGE = 500  # дальше 500-й страницы TMDB не отдаёт
 MIN_RATING = 7
 MIN_VOTES = 200
+TOP_MIN_VOTES = 5000
 MAX_OVERVIEW = 700  # подпись к фото в Telegram — максимум 1024 символа
 
 
@@ -32,7 +33,8 @@ async def _get(path: str, **params) -> dict:
 
 
 async def top_rated(page: int = 1) -> dict:
-    return await _get("/movie/top_rated", page=page)
+    # /movie/top_rated поднимает наверх свежие фильмы с парой сотен голосов
+    return await _get("/discover/movie", page=page, sort_by="vote_average.desc", **{"vote_count.gte": TOP_MIN_VOTES})
 
 
 async def now_playing(page: int = 1) -> dict:
